@@ -1,0 +1,33 @@
+
+name: CI Pipeline with Slack Notification
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run CI step
+        run: echo "CI pipeline executed successfully!"
+
+      - name: Send Slack notification
+        if: always()
+        uses: slackapi/slack-github-action@v3.0.3
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: |
+              GitHub CI Pipeline Notification
+              Repository: ${{ github.repository }}
+              Branch: ${{ github.ref_name }}
+              Commit: ${{ github.sha }}
+              Status: ${{ job.status }}
+              Commit URL: ${{ github.event.head_commit.url }}
